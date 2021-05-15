@@ -17,7 +17,7 @@ assets:
   repository:
     type: blob.asset
     data:
-      url: 'https://github.com/balenalabs/balena-sound'
+      url: 'https://github.com/mister-what/balena-sound'
   logo:
     type: blob.asset
     data:

@@ -2,6 +2,9 @@ version: '2'
 
 volumes:
   spotifycache:
+  speedtest-data:
+  settings:
+  dashboard-data:
 
 services:
 
@@ -67,3 +70,46 @@ services:
     network_mode: host
     ports:
       - 49494:49494
+
+ # speed test
+
+  speedtest:
+    build: ./speedtest
+    privileged: true
+    restart: never
+    volumes:
+      - 'speedtest_-data:/data'
+    network_mode: host
+    labels:
+      io.balena.features.supervisor-api: 1
+  connector:
+    image: balenablocks/connector
+    restart: always
+    labels:
+      io.balena.features.balena-api: '1'
+    privileged: true
+  dashboard:
+    restart: always
+    build: ./dashboard
+    ports:
+      - "80"
+    volumes:
+      - 'dashboard-data:/data'
+  influxdb:
+    image: influxdb@sha256:73f876e0c3bd02900f829d4884f53fdfffd7098dd572406ba549eed955bf821f
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=balena
+      - INFLUXDB_USER=balena
+      - INFLUXDB_ADMIN_ENABLED=true
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - INFLUXDB_DATA_DIR=/data
+    volumes:
+      - 'speedtest_-data:/data'
+  mqtt:
+    image: arm32v6/eclipse-mosquitto@sha256:ec3e1dbb9e198ff04d62c2d0f6eff74cad7438c7d080b89a28428fb96c8479c4
+    ports:
+      - "1883:1883"
+    restart: always
